@@ -133,7 +133,7 @@ namespace Arc4u.Cyphertool.Helpers
                               .LogIfFailed()
                               .OnSuccessNotNull((pem) =>
                               {
-                                  var folderInfo = "Save encrypted private key to {name}";
+                                  var folderInfo = "Save private key to {name}";
                                   var consoleInfo = "Extract private key.";
                                   var content = pem;
                                   if (x509Encrypt is not null)
@@ -144,6 +144,7 @@ namespace Arc4u.Cyphertool.Helpers
                                             {
                                                 content = encrypted;
                                                 consoleInfo = "Extract encrypted private key.";
+                                                folderInfo = "Save encrypted private key to {name}";
                                             });
                                   }
 

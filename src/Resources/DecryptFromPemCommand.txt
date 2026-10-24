@@ -1,0 +1,29 @@
+----------------------------------
+|       Arc4u Cyphertool.        |
+----------------------------------
+
+Decrypt from a pem certificate file (.pem, .crt or .cer) and its pem private key file.
+The certificate can have an RSA or an EC key.
+
+
+                                                                             / text "cypher text" \
+arc4u.cyphertool decrypt with pem "C:\temp\devCert.pem" -k "C:\temp\key.pem" |                      | -o "file"
+                                                                             \ file "path"        /
+
+
+-k | --key      => The pem private key file (PRIVATE KEY, RSA PRIVATE KEY, EC PRIVATE KEY or ENCRYPTED PRIVATE KEY).
+-p | --password => The password of the private key, only when the key is encrypted (ENCRYPTED PRIVATE KEY).
+
+On Windows, pem files are the simplest way to decrypt with an EC certificate: the key is always exportable.
+
+You can decrypt a text or a file by adding the following commands:
+    text => The text to decrypt
+    file => The file to decrypt
+
+Example:
+
+arc4u.cyphertool decrypt with pem /path/to/cert.pem -k /path/to/key.pem text "cypher text"
+arc4u.cyphertool decrypt with pem /path/to/cert.pem -k /path/to/key.pem file "the path to the file to decrypt."
+
+arc4u.cyphertool decrypt with pem /path/to/cert.pem -k /path/to/encrypted.key.pem -p password text "cypher text"
+

@@ -61,6 +61,24 @@ namespace Arc4u.Cyphertool.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Decrypt from a pem certificate file and its private key.
+        /// </summary>
+        internal static string DecryptFromPemCommand {
+            get {
+                return ResourceManager.GetString("DecryptFromPemCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Encrypt from a pem certificate file.
+        /// </summary>
+        internal static string EncryptFromPemCommand {
+            get {
+                return ResourceManager.GetString("EncryptFromPemCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ----------------------------------
         ///|       Arc4u Cyphertool.        |
         ///----------------------------------

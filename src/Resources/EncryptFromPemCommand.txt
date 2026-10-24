@@ -1,0 +1,26 @@
+----------------------------------
+|       Arc4u Cyphertool.        |
+----------------------------------
+
+Encrypt from a pem certificate file (.pem, .crt or .cer).
+
+Only the public certificate is needed to encrypt: no private key and no password.
+The certificate can have an RSA or an EC key.
+
+As the text to encrypt can contain a $0 by example, you have to use the single quote to specify the text to encrypt.
+Otherwise the $0 will be the end of the text to encrypt.
+
+                                                         / text 'clear text' \
+arc4u.cyphertool encrypt with pem "C:\temp\devCert.pem" |                     | -o "file"
+                                                         \ file "path"       /
+
+
+You can encrypt a text or a file by adding the following commands:
+    text => The text to encrypt
+    file => The file to encrypt
+
+Example:
+
+arc4u.cyphertool encrypt with pem /path/to/cert.pem text 'clear text'
+arc4u.cyphertool encrypt with pem /path/to/cert.pem file "the path to the file to encrypt."
+

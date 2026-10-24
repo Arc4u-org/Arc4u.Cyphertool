@@ -17,7 +17,7 @@
 
 --------------------------------------------------------------------------------------
 
-Cyphertool is a tool around certificate to encrypt and decrypt text or file using a certificate or a pfx file, but also to extract the public, authority and private key from a pfx file.
+Cyphertool is a tool around certificate to encrypt and decrypt text or file using a certificate (RSA or EC key), a pfx file or pem files, but also to extract the public, authority and private key from a pfx file.
 
 The following commands exist:
 

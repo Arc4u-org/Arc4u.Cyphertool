@@ -5,6 +5,7 @@
 Let you extract the public, private and optionally the certificate public key authorities from a pfx certificate.
 Let you choose to encrypt the private key with another certificate.
 The result will be written in a console or in 2 or 3 files.
+The private key, RSA or EC, is written as a PKCS#8 pem (-----BEGIN PRIVATE KEY-----).
 
 
                                                                                |                / pfx "C:\temp\devCert.pfx" -p password 

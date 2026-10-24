@@ -46,6 +46,7 @@ internal class EncryptFileCommand
             var storeName = parent?.Options.FirstOrDefault(a => a.LongName is not null && a.LongName.Equals("storename", StringComparison.OrdinalIgnoreCase));
             var storeLocation = parent?.Options.FirstOrDefault(a => a.LongName is not null && a.LongName.Equals("storelocation", StringComparison.OrdinalIgnoreCase));
             var password = parent?.Options.FirstOrDefault(a => a.LongName is not null && a.LongName.Equals("password", StringComparison.OrdinalIgnoreCase));
+            var key = parent?.Options.FirstOrDefault(a => a.LongName is not null && a.LongName.Equals("key", StringComparison.OrdinalIgnoreCase));
 
             if (null == certifcate?.Value)
             {
@@ -76,7 +77,7 @@ internal class EncryptFileCommand
             }
 
 
-            _certificateHelper.GetCertificate(certifcate.Value, password?.Value(), storeName?.Value(), storeLocation?.Value())
+            _certificateHelper.GetCertificate(certifcate.Value, password?.Value(), storeName?.Value(), storeLocation?.Value(), key: key?.Value())
                               .LogIfFailed()
                               .OnSuccessNotNull(x509 =>
                               {

@@ -2,7 +2,8 @@
 |       Arc4u Cyphertool.        |
 ----------------------------------
 
-Let you encrypt a text or a file using a certificate or a pfx file.
+Let you encrypt a text or a file using a certificate, a pfx file or pem files.
+The certificate can have an RSA or an EC key.
 
 With a certificate in the certificate store or keychain.
 arc4u.cyphertool encrypt with certificate-store "certifcate friendly name" text "clear text"
@@ -11,14 +12,19 @@ As the text to encrypt can contain a $0 by example, you have to use the single q
 Otherwise the $0 will be the end of the text to encrypt.
 
 
-                               / pfx "C:\temp\devCert.pfx" -p password \ / text 'clear text' \
-arc4u.cyphertool encrypt with |                                         |                     | -o "file"
-                               \ cert "devCert" -l LocalMachine -n My  / \ file "path"       /
+                               / pfx "C:\temp\devCert.pfx" -p password \
+                              |                                         |   / text 'clear text' \
+arc4u.cyphertool encrypt with |  pem "C:\temp\devCert.pem"              |  |                     | -o "file"
+                              |                                         |   \ file "path"       /
+                               \ cert "devCert" -l LocalMachine -n My  /
 
 
 
 With a pfx file.
     -p | --password is not given, a prompt will ask the password.
+
+With a pem file (.pem, .crt or .cer).
+    Only the public certificate is needed to encrypt.
 
 With a certificate from the store or the keychain.
     The search is only based on the friendly name.

@@ -15,6 +15,8 @@ Optionnaly you can add the password to the pfx file.
 
 If the password is not set, a prompt will be displayed to ask for the password.
 
+The private key is loaded as exportable, which is needed on Windows to decrypt with an EC certificate.
+
 You can decrypt a text or a file by adding the following commands:
     text => The text to decrypt
     file => The file to decrypt

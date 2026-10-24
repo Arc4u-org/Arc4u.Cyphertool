@@ -44,6 +44,7 @@ internal class DecryptFileCommand
             var storeName = parent?.Options.FirstOrDefault(a => a.LongName is not null && a.LongName.Equals("storename", StringComparison.OrdinalIgnoreCase));
             var storeLocation = parent?.Options.FirstOrDefault(a => a.LongName is not null && a.LongName.Equals("storelocation", StringComparison.OrdinalIgnoreCase));
             var password = parent?.Options.FirstOrDefault(a => a.LongName is not null && a.LongName.Equals("password", StringComparison.OrdinalIgnoreCase));
+            var key = parent?.Options.FirstOrDefault(a => a.LongName is not null && a.LongName.Equals("key", StringComparison.OrdinalIgnoreCase));
 
             if (null == certifcate?.Value)
             {
@@ -74,10 +75,16 @@ internal class DecryptFileCommand
             }
 
 
-            _certificateHelper.GetCertificate(certifcate.Value, password?.Value(), storeName?.Value(), storeLocation?.Value())
+            _certificateHelper.GetCertificate(certifcate.Value, password?.Value(), storeName?.Value(), storeLocation?.Value(), privKeyIsExportable: true, key: key?.Value())
                               .LogIfFailed()
                               .OnSuccessNotNull(x509 =>
                               {
+                                  if (!x509.HasPrivateKey)
+                                  {
+                                      _logger.Technical().LogError("The certificate {subject} has no private key. With a pem certificate, give the private key with -k | --key.", x509.Subject);
+                                      return;
+                                  }
+
                                   Result.Try(() => x509.Decrypt(File.ReadAllText(fileArgument.Value)))
                                   .LogIfFailed()
                                   .OnSuccessNotNull(text =>

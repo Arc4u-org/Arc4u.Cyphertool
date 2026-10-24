@@ -1,0 +1,48 @@
+<Project>
+  <!-- See https://aka.ms/dotnet/msbuild/customize for more details on customizing your build -->
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <!-- disable warning when XML comments are missing -->
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <!-- By default every projects are packable -->
+    <IsPackable>true</IsPackable>
+    <!-- But unit test project are not. -->
+    <IsPackable Condition="$(MSBuildProjectName.EndsWith('Test')) OR $(MSBuildProjectName.EndsWith('Tests'))">false</IsPackable>
+    <IsAotCompatible>true</IsAotCompatible>
+  </PropertyGroup>
+
+  <!-- Packaging -->
+  <PropertyGroup Condition="'$(Configuration)'=='Release' AND $(IsPackable) == true">
+    <Authors>Gilles Flisch</Authors>
+    <Company>Arc4u</Company>
+    <Copyright>Gilles Flisch 2026</Copyright>
+    <PackageIcon>Arc4u.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageProjectUrl>https://github.com/GFlisch/Arc4u.Cyphertool</PackageProjectUrl>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <RepositoryUrl>https://github.com/GFlisch/Arc4u.Cyphertool</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>Arc4u</PackageTags>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <RootNamespace>$(MSBuildProjectName)</RootNamespace>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(Configuration)'=='Release' AND $(IsPackable) == true">
+    <None Include="$(MSBuildProjectDirectory)/README.md" Pack="true" PackagePath="\" Visible="false" />
+    <None Include="$(MSBuildThisFileDirectory)../LICENSE" Pack="true" PackagePath="\" Visible="false" />
+    <None Include="$(MSBuildThisFileDirectory)../Arc4u.png" Pack="true" PackagePath="\" Visible="false" />
+  </ItemGroup>
+
+  <!-- Always set to true when GitHub Actions is running the workflow -->
+  <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+</Project>

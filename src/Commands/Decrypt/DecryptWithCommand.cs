@@ -10,19 +10,23 @@ internal class DecryptWithCommand
 {
     public DecryptWithCommand(ILogger<DecryptWithCommand> logger,
                               DecryptWithCertificateStoreCommand fromStoreCommand,
-                              DecryptWithPfxFileCommand fromPfxFileCommand)
+                              DecryptWithPfxFileCommand fromPfxFileCommand,
+                              DecryptWithPemFileCommand fromPemFileCommand)
     {
         _logger = logger;
         _fromStoreCommand = fromStoreCommand;
         _fromPfxFileCommand = fromPfxFileCommand;
+        _fromPemFileCommand = fromPemFileCommand;
     }
 
     readonly DecryptWithPfxFileCommand _fromPfxFileCommand;
+    readonly DecryptWithPemFileCommand _fromPemFileCommand;
     readonly DecryptWithCertificateStoreCommand _fromStoreCommand;
     readonly ILogger<DecryptWithCommand> _logger;
 
     const string certificateStoreCommand = "certificate-store";
     const string pfxFileCommand = "pfx";
+    const string pemFileCommand = "pem";
     public void Configure(CommandLineApplication cmd)
     {
         cmd.FullName = nameof(DecryptWithCommand);
@@ -34,6 +38,7 @@ internal class DecryptWithCommand
         certCommand.AddName("keychain");
 
         cmd.Command(pfxFileCommand, _fromPfxFileCommand.Configure);
+        cmd.Command(pemFileCommand, _fromPemFileCommand.Configure);
 
         cmd.OnExecute(() =>
         {

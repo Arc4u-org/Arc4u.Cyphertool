@@ -1,0 +1,16 @@
+<Project>
+  <PropertyGroup>
+    <!-- Enable central package management, https://learn.microsoft.com/en-us/nuget/consume-packages/Central-Package-Management -->
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <Arc4uVersion>9.0.0-preview39</Arc4uVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="Arc4u" Version="$(Arc4uVersion)" />
+    <PackageVersion Include="Arc4u.Results" Version="$(Arc4uVersion)" />
+    <PackageVersion Include="McMaster.Extensions.CommandLineUtils" Version="5.1.0" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="11.0.0-rc.2.26504.105" />
+    <PackageVersion Include="Serilog" Version="4.4.0" />
+    <PackageVersion Include="Serilog.Extensions.Logging" Version="10.0.0" />
+    <PackageVersion Include="Serilog.Sinks.Console" Version="6.1.1" />
+  </ItemGroup>
+</Project>

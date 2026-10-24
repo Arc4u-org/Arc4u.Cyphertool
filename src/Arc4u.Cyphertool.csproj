@@ -2,23 +2,39 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>arc4u.cyphertool</ToolCommandName>
     <PackageOutputPath>./nupkg</PackageOutputPath>
+    <!-- The CLI (tool package) version. -->
+    <Version>2.0.0</Version>
+  </PropertyGroup>
+
+  <!-- Native AOT: 'dotnet publish -r <rid>' produces a trimmed, self-contained native executable. -->
+  <PropertyGroup>
+    <PublishAot>true</PublishAot>
+    <!-- The native executable has no use for the XML doc file; publishing it fails under AOT (it is not copied to the RID output folder). -->
+    <PublishDocumentationFile>false</PublishDocumentationFile>
+    <PublishReferencesDocumentationFiles>false</PublishReferencesDocumentationFiles>
+    <!-- Tool packaging (.NET 10+): 'dotnet pack' builds the top-level package that points to one package per
+         RID; 'dotnet pack -r <rid>' (on that OS) builds the native AOT package for it. -->
+    <ToolPackageRuntimeIdentifiers>win-x64;win-arm64;linux-x64;linux-arm64;osx-arm64;osx-x64</ToolPackageRuntimeIdentifiers>
+    <!-- Restore every RID: the top-level 'dotnet pack' also builds the packages for the current OS. -->
+    <RuntimeIdentifiers>$(ToolPackageRuntimeIdentifiers)</RuntimeIdentifiers>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(PublishAot)' == 'true'">
+    <!-- Keep the native debug symbols out of the publish folder, and so out of the tool packages. -->
+    <CopyOutputSymbolsToPublishDirectory>false</CopyOutputSymbolsToPublishDirectory>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Arc4u.Standard" Version="8.3.0-preview03" />
-    <PackageReference Include="Arc4u.Standard.Results" Version="8.3.0-preview03" />
-    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.1.1" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
-    <PackageReference Include="Serilog" Version="4.0.2" />
-    <PackageReference Include="Serilog.Extensions.Logging" Version="8.0.0" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
-    <PackageReference Include="System.Text.Json" Version="8.0.5" />
+    <PackageReference Include="Arc4u" />
+    <PackageReference Include="Arc4u.Results" />
+    <PackageReference Include="McMaster.Extensions.CommandLineUtils" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+    <PackageReference Include="Serilog" />
+    <PackageReference Include="Serilog.Extensions.Logging" />
+    <PackageReference Include="Serilog.Sinks.Console" />
   </ItemGroup>
 
   <ItemGroup>
@@ -34,10 +50,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>HelpTexts.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="nupkg\" />
   </ItemGroup>
 
 </Project>

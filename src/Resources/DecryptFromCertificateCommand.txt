@@ -20,6 +20,9 @@ Two optional parameters can be used to specify the store name and the store loca
                             Like on Windows: CurrentUser or LocalMachine.
                             Default is CurrentUser!
 
+With an EC certificate on Windows, the private key must have been imported as exportable:
+the key agreement needed to decrypt is done on a copy of the key.
+
 You can decrypt a text or a file by adding the following commands:
     text => The text to decrypt
     file => The file to decrypt

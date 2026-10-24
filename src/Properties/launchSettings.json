@@ -2,7 +2,7 @@
   "profiles": {
     "Arc4u.Cyphertool": {
       "commandName": "Project",
-      "commandLineArgs": "decrypt with cert \"encryptorsha2Dev.belgrid.net\" text \"o0+UNB+xrbeS1JUy/OFbbFW9PyT8N0Ksr+KIKmy49K5pw0azCvD926Y042QGBDw2byDk8mEWFt9XqPRoMvcDGsrqLEUXB9D1zv/iNo6mQ0ddeJeJgjx/ymXlBBapTUUC6fUacGrsiKjT2HCdZpBxhM582arabKUJEQYX7KYM06zbDfBMbYsZcVIlaY/xi8tgX8DHZuRuaHbtHMK7VLEIj2VkDRAJNLwkDOhylGOjx6UEAu/AqeZO1n52nWcU8OMWB8wg8TjGYdyivRr7qYdrcbrX41q0XDHR5/2tAwETwCT9bqTHhRfIQGuCy7KsmdS711JVflVzMlKtDBYVw1Hj9Q==\""
+      "commandLineArgs": " extract pfx C:\\Users\\gflisch\\arc4u-encryptor.pfx -ca"
     }
   }
 }

@@ -2,7 +2,7 @@
 // The Arc4u Foundation licenses this file to you under the MIT license.
 
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.ConstrainedExecution;
+using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using Arc4u.Security;
@@ -24,12 +24,24 @@ namespace Arc4u.Cyphertool
         readonly ILogger<CertificateHelper> _logger;
         readonly IX509CertificateLoader _x509CertificateLoader;
 
-        public Result<X509Certificate2> GetCertificate([DisallowNull] string cert, string? password, string? storeName, string? storeLocation, bool privKeyIsExportable = false, string prompt = "Password:")
+        /// <summary>
+        /// Load a certificate from a pfx file, from pem files or from the certificate store (keychain).
+        /// The source is chosen from the file extension: .pfx or .p12 is a pfx file, .pem, .crt or .cer is a pem certificate,
+        /// anything else is the friendly name of a certificate in the store.
+        /// </summary>
+        /// <param name="privKeyIsExportable">Load the private key of a pfx file as exportable. Needed to extract the key, and to decrypt with an EC certificate on Windows.</param>
+        /// <param name="key">The pem private key file of a pem certificate. Without it, only the public key is loaded (enough to encrypt).</param>
+        public Result<X509Certificate2> GetCertificate([DisallowNull] string cert, string? password, string? storeName, string? storeLocation, bool privKeyIsExportable = false, string prompt = "Password:", string? key = null)
         {
             ArgumentNullException.ThrowIfNullOrWhiteSpace(cert);
 
-            // Certificate is coming from the store if the certOption.Value() does not contain a file name ending with .pfx
-            bool fromCertStore = !cert.EndsWith(".pfx");
+            if (HasExtension(cert, ".pem", ".crt", ".cer"))
+            {
+                return GetCertificateFromPemFile(cert, key, password);
+            }
+
+            // Certificate is coming from the store if the file name does not end with .pfx or .p12
+            bool fromCertStore = !HasExtension(cert, ".pfx", ".p12");
 
             if (fromCertStore)
             {
@@ -45,6 +57,10 @@ namespace Arc4u.Cyphertool
                 return GetCertificateFromFile(cert, password, privKeyIsExportable);
             }
         }
+
+        private static bool HasExtension(string cert, params string[] extensions)
+            => extensions.Any(extension => cert.EndsWith(extension, StringComparison.OrdinalIgnoreCase));
+
         private Result<X509Certificate2> GetCertificateFromFile(string cert, string? password, bool privKeyIsExportable)
         {
             if (!File.Exists(cert))
@@ -52,7 +68,33 @@ namespace Arc4u.Cyphertool
                 return Result.Fail($"The certificate file {cert} does not exist!");
             }
 
-            return Result.Try(() => privKeyIsExportable ? new X509Certificate2(cert, password, X509KeyStorageFlags.Exportable) : new X509Certificate2(cert, password));
+            return Result.Try(() => System.Security.Cryptography.X509Certificates.X509CertificateLoader.LoadPkcs12FromFile(cert, password, privKeyIsExportable ? X509KeyStorageFlags.Exportable : X509KeyStorageFlags.DefaultKeySet));
+        }
+
+        /// <summary>
+        /// Load a pem (or der) certificate, with its pem private key when <paramref name="key"/> is given.
+        /// The private key can be encrypted (ENCRYPTED PRIVATE KEY), its password is then <paramref name="password"/>.
+        /// </summary>
+        private Result<X509Certificate2> GetCertificateFromPemFile(string cert, string? key, string? password)
+        {
+            if (!File.Exists(cert))
+            {
+                return Result.Fail($"The certificate file {cert} does not exist!");
+            }
+
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                return Result.Try(() => System.Security.Cryptography.X509Certificates.X509CertificateLoader.LoadCertificateFromFile(cert));
+            }
+
+            if (!File.Exists(key))
+            {
+                return Result.Fail($"The private key file {key} does not exist!");
+            }
+
+            return Result.Try(() => string.IsNullOrEmpty(password)
+                                        ? X509Certificate2.CreateFromPemFile(cert, key)
+                                        : X509Certificate2.CreateFromEncryptedPemFile(cert, password, key));
         }
         private Result<X509Certificate2> GetCertificateFromStore(string cert, string? storeName, string? storeLocation)
         {
@@ -105,16 +147,22 @@ namespace Arc4u.Cyphertool
             });
         }
 
+        /// <summary>
+        /// Export the private key (RSA or EC) in a PKCS#8 pem (PRIVATE KEY), the format read by X509Certificate2.CreateFromPemFile and openssl.
+        /// </summary>
         public Result<string> ConvertPrivateKeyToPem(X509Certificate2 x509)
         {
-            var privateKey = x509.GetRSAPrivateKey();
+            AsymmetricAlgorithm? privateKey = x509.GetRSAPrivateKey() ?? (AsymmetricAlgorithm?)x509.GetECDsaPrivateKey() ?? x509.GetECDiffieHellmanPrivateKey();
             if (privateKey is null)
             {
-                return Result.Fail("The certificate doesn't have a RSA private key.");
+                return Result.Fail("The certificate doesn't have a RSA or an EC private key.");
             }
             return Result.Try(() =>
             {
-                return ConvertToPem(privateKey.ExportRSAPrivateKey(), "PRIVATE KEY", true);
+                using (privateKey)
+                {
+                    return ConvertToPem(privateKey.ExportPkcs8PrivateKey(), "PRIVATE KEY", true);
+                }
             });
         }
         private string ConvertToPem(string base64EncodedData, bool split = false)

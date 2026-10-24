@@ -2,21 +2,28 @@
 |       Arc4u Cyphertool.        |
 ----------------------------------
 
-Let you decrypt a text or a file using a certificate or a pfx file.
+Let you decrypt a text or a file using a certificate, a pfx file or pem files.
+The certificate can have an RSA or an EC key.
 
 With a certificate in the certificate store or keychain.
 arc4u.cyphertool decrypt with certificate-store "certifcate friendly name" text "clear text"
 
 
 
-                               / pfx "C:\temp\devCert.pfx" -p password \ / text "clear text" \
-arc4u.cyphertool decrypt with |                                         |                     | -o "file"
-                               \ cert "devCert" -l LocalMachine -n My  / \ file "path"       /
+                               / pfx "C:\temp\devCert.pfx" -p password            \
+                              |                                                    |   / text "cypher text" \
+arc4u.cyphertool decrypt with | pem "C:\temp\devCert.pem" -k "C:\temp\devCert.key" |  |                      | -o "file"
+                              |                                                    |   \ file "path"        /
+                               \ cert "devCert" -l LocalMachine -n My             /
 
 
 
 With a pfx file.
     -p | --password is not given, a prompt will ask the password.
+
+With a pem file (.pem, .crt or .cer).
+    -k | --key      : The pem private key file.
+    -p | --password : The password of the private key, only when the key is encrypted.
 
 With a certificate from the store or the keychain.
     The search is only based on the friendly name.
@@ -27,3 +34,7 @@ With a certificate from the store or the keychain.
                             Default is CurrentUser!
 
 If no -o | --output option is given the content will be written to the console.
+
+On Windows, decrypting with an EC certificate needs an exportable private key:
+a pfx file is always loaded with an exportable key, pem files always work,
+and a certificate in the store must have been imported with an exportable private key.

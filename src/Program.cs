@@ -5,6 +5,7 @@ using System.Reflection;
 using Arc4u.Cyphertool.Commands;
 using Arc4u.Cyphertool.Helpers;
 using Arc4u.Cyphertool.Resources;
+using Arc4u.Dependency;
 using Arc4u.Results.Logging;
 using Arc4u.Security.Cryptography;
 using FluentResults;
@@ -90,6 +91,8 @@ class Program
     {
         // Add Serilog to the logging pipeline
         services.AddLogging(configure => configure.AddSerilog());
+        // The Arc4u logger, needed by the Technical() fluent API.
+        services.AddILogger();
         services.AddSingleton<CertificateHelper>();
         services.AddSingleton<IX509CertificateLoader, X509CertificateLoader>();
 
@@ -97,6 +100,7 @@ class Program
         services.AddSingleton<EncryptWithCommand>();
         services.AddSingleton<EncryptWithCertificateStoreCommand>();
         services.AddSingleton<EncryptWithPfxFileCommand>();
+        services.AddSingleton<EncryptWithPemFileCommand>();
         services.AddSingleton<EncryptTextCommand>();
         services.AddSingleton<EncryptFileCommand>();
 
@@ -104,6 +108,7 @@ class Program
         services.AddSingleton<DecryptWithCommand>();
         services.AddSingleton<DecryptWithCertificateStoreCommand>();
         services.AddSingleton<DecryptWithPfxFileCommand>();
+        services.AddSingleton<DecryptWithPemFileCommand>();
         services.AddSingleton<DecryptTextCommand>();
         services.AddSingleton<DecryptFileCommand>();
 
