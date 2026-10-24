@@ -1,0 +1,33 @@
+----------------------------------
+|       Arc4u Cyphertool.        |
+----------------------------------
+
+Create a root certificate and a certificate signed by it, at the same time.
+
+arc4u.cyphertool create chain "CN=My Root CA" "CN=My Certificate" -rp root-password -p password -f "folder"
+
+A subject without a "=" is the common name: "My Root CA" is "CN=My Root CA".
+
+The root certificate:
+    -rp  | --root-password => The password protecting the root pfx file and its private key.
+                              If not given, a prompt will ask the password (twice).
+    -ry  | --root-years    => The validity of the root in years. Default is 10.
+
+The certificate:
+    -p   | --password                 => The password protecting the pfx file and the private key.
+                                         If not given, a prompt will ask the password (twice).
+    -y   | --years                    => The validity in years. Default is 2.
+    -ks  | --key-size                 => The RSA key size: 2048, 3072 (default) or 4096.
+    -c   | --curve                    => The EC curve: P-256 (default), P-384 or P-521.
+    -san | --subject-alternative-name => A dns name or an ip address, can be repeated: -san server.local -san 10.0.0.1
+
+Both:
+    -f   | --folder   => The folder to store the files. Default is the current directory.
+    -kt  | --key-type => rsa (default) or ec. The root uses a RSA 4096 or an EC P-384 key.
+
+The files {CN}.pfx, {CN}.pem and {CN}.key.pem are created for both certificates.
+
+Example:
+
+arc4u.cyphertool create chain "My Root CA" "My Certificate" -f ./certs
+arc4u.cyphertool create chain "CN=My Root CA, O=Company" "CN=api.local, O=Company" -kt ec -san api.local -f ./certs

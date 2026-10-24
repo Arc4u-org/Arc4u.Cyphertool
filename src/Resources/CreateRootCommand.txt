@@ -1,0 +1,25 @@
+----------------------------------
+|       Arc4u Cyphertool.        |
+----------------------------------
+
+Create a root certificate (a certificate authority) and save it alone.
+The root can only sign certificates: it is not used to encrypt.
+
+arc4u.cyphertool create root "CN=My Root CA, O=Company" -p password -f "folder"
+
+A subject without a "=" is the common name: "My Root CA" is "CN=My Root CA".
+
+    -p  | --password => The password protecting the pfx file and the private key.
+                        If not given, a prompt will ask the password (twice).
+    -f  | --folder   => The folder to store the files. Default is the current directory.
+    -kt | --key-type => rsa (default) or ec.
+    -ks | --key-size => The RSA key size: 2048, 3072 or 4096 (default).
+    -c  | --curve    => The EC curve: P-256, P-384 (default) or P-521.
+    -y  | --years    => The validity in years. Default is 10.
+
+The files {CN}.pfx, {CN}.pem and {CN}.key.pem are created.
+
+Example:
+
+arc4u.cyphertool create root "My Root CA" -f ./certs
+arc4u.cyphertool create root "CN=My Root CA, O=Company" -kt ec -y 20 -f ./certs

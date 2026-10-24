@@ -24,7 +24,12 @@ namespace Arc4u.Cyphertool.Helpers
 
         readonly ILogger<CertificateHelper> _logger;
         readonly CertificateHelper _certificateHelper;
-        public int ExtractCertificatePems(CommandArgument<string> certifcate, CommandOption passwordOption, CommandOption folderOption, CommandOption caOption, X509Certificate2? x509Encrypt = null)
+        /// <summary>
+        /// Extract the public key, the private key in clear (or encrypted with <paramref name="x509Encrypt"/>) and optionally the CA certificates.
+        /// </summary>
+        /// <param name="keyOption">The pem private key file, when the certificate is a pem file.</param>
+        /// <param name="caOption">Extract the CA certificates, null when not supported (pem file).</param>
+        public int ExtractCertificatePems(CommandArgument<string> certifcate, CommandOption passwordOption, CommandOption folderOption, CommandOption? caOption, X509Certificate2? x509Encrypt = null, CommandOption? keyOption = null)
         {
             Result result = Result.Ok();
             CheckCertificateArgument(certifcate)
@@ -32,7 +37,7 @@ namespace Arc4u.Cyphertool.Helpers
                 .OnFailed(result)
                 .OnSuccessNotNull(cert =>
                 {
-                    _certificateHelper.GetCertificate(cert, passwordOption?.Value(), null, null, true)
+                    _certificateHelper.GetCertificate(cert, passwordOption?.Value(), null, null, true, key: keyOption?.Value())
                           .LogIfFailed()
                           .OnFailed(result)
                           .OnSuccessNotNull(x509 =>
@@ -59,7 +64,7 @@ namespace Arc4u.Cyphertool.Helpers
                               ExtractCertificateAuthorities(x509, caOption, commonName, folder);
                           });
                 });
-            return result.IsSuccess ? 1 : -1;
+            return result.IsSuccess ? 0 : -1;
         }
 
         private Result<string> CheckCertificateArgument(CommandArgument<string> certifcate)
@@ -77,9 +82,9 @@ namespace Arc4u.Cyphertool.Helpers
             return Result.Ok(certifcate.Value);
         }
 
-        private void ExtractCertificateAuthorities(X509Certificate2 x509, CommandOption caOption, string commonName, string? folder)
+        private void ExtractCertificateAuthorities(X509Certificate2 x509, CommandOption? caOption, string commonName, string? folder)
         {
-            if (caOption.HasValue())
+            if (caOption is not null && caOption.HasValue())
             {
                 // chain.
                 var chain = new X509Chain();
@@ -110,7 +115,7 @@ namespace Arc4u.Cyphertool.Helpers
                     }
                     if (folder is not null)
                     {
-                        var fileName = SaveFile(sb.ToString(), folder, commonName, "{0}.ca.pem");
+                        var fileName = FileHelper.SaveFile(sb.ToString(), folder, commonName, "{0}.ca.pem");
                         _logger.Technical().LogInformation("Save certificates authority public keys to {filename}", fileName);
                     }
                     else
@@ -151,7 +156,7 @@ namespace Arc4u.Cyphertool.Helpers
 
                                   if (folder is not null)
                                   {
-                                      var fileName = SaveFile(content, folder, commonName, "{0}.key.pem");
+                                      var fileName = FileHelper.SaveFile(content, folder, commonName, "{0}.key.pem");
                                       _logger.Technical().LogInformation(folderInfo, fileName);
                                   }
                                   else
@@ -170,7 +175,7 @@ namespace Arc4u.Cyphertool.Helpers
                               {
                                   if (folder is not null)
                                   {
-                                      var fileName = SaveFile(pem, folder, commonName, "{0}.pem");
+                                      var fileName = FileHelper.SaveFile(pem, folder, commonName, "{0}.pem");
                                       _logger.Technical().LogInformation("Save public key to {name}", fileName);
                                   }
                                   else
@@ -179,19 +184,6 @@ namespace Arc4u.Cyphertool.Helpers
                                       Console.WriteLine(pem);
                                   }
                               });
-        }
-
-        private string SaveFile(string content, string folder, string commonName, string pattern)
-        {
-            var fileName = Path.Combine(folder, string.Format(pattern, commonName));
-            var idx = 1;
-            while (File.Exists(fileName))
-            {
-                fileName = Path.Combine(folder, string.Format(pattern, $"{commonName}({idx++})"));
-            }
-            File.WriteAllText(fileName, content);
-
-            return fileName;
         }
     }
 }

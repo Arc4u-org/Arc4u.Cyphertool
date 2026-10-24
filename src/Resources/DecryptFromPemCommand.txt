@@ -13,6 +13,7 @@ arc4u.cyphertool decrypt with pem "C:\temp\devCert.pem" -k "C:\temp\key.pem" |  
 
 -k | --key      => The pem private key file (PRIVATE KEY, RSA PRIVATE KEY, EC PRIVATE KEY or ENCRYPTED PRIVATE KEY).
 -p | --password => The password of the private key, only when the key is encrypted (ENCRYPTED PRIVATE KEY).
+                   If not given, a prompt will ask the password.
 
 On Windows, pem files are the simplest way to decrypt with an EC certificate: the key is always exportable.
 

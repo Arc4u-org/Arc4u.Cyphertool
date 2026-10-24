@@ -27,6 +27,8 @@ The following commands exist:
 
 - Extract: Extract the public, authority and private key from a pfx file.
 
+- create: Create a root certificate (certificate authority) and certificates signed by it.
+
 You can use the --help option to get more information about each command.
 
 like => arc4u.cyphertool encrypt --help.

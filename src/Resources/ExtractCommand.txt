@@ -14,6 +14,12 @@ arc4u.cyphertool extract pfx "C:\temp\devCert.pfx" -p password -ca -f "folder" |
                                                                                        
                                                                                => optional
 
+To extract the private key in clear from a pem certificate and its (encrypted) private key:
+
+arc4u.cyphertool extract pem "C:\temp\devCert.pem" -k "C:\temp\devCert.key.pem" -p password -f "folder"
+
+See arc4u.cyphertool extract pem --help.
+
 Extract command:
     -p  | --password is not given, a prompt will ask the password.
     -ca | --certificate-authorities, extract the CA certificates."

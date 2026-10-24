@@ -1,0 +1,24 @@
+----------------------------------
+|       Arc4u Cyphertool.        |
+----------------------------------
+
+Let you extract the public certificate and the private key in clear from a pem certificate and its private key.
+Useful to decrypt the encrypted private key (-----BEGIN ENCRYPTED PRIVATE KEY-----) written by the create command,
+like to store it in a Kubernetes secret.
+The private key, RSA or EC, is written as an unencrypted PKCS#8 pem (-----BEGIN PRIVATE KEY-----).
+The result will be written in a console or in 2 files: {CN}.pem and {CN}.key.pem.
+
+arc4u.cyphertool extract pem "C:\temp\devCert.pem" -k "C:\temp\devCert.key.pem" -p password -f "folder"
+
+    -k | --key      => The pem private key file.
+    -p | --password => The password of the private key, only when the key is encrypted (ENCRYPTED PRIVATE KEY).
+                       If not given, a prompt will ask the password.
+    -f | --folder   => The folder to store the files. Without it, the keys are written in the console.
+                       An existing file is never overwritten: use another folder than the one of the encrypted key.
+
+The private key in clear is not protected anymore: delete the file once it is stored where it is used.
+
+Example:
+
+arc4u.cyphertool extract pem "./certs/My Certificate.pem" -k "./certs/My Certificate.key.pem" -f ./k8s
+kubectl create secret tls my-certificate --cert="./k8s/My Certificate.pem" --key="./k8s/My Certificate.key.pem"

@@ -66,6 +66,7 @@ class Program
             app.Command("encrypt", serviceProvider.GetRequiredService<EncryptCommand>().Configure);
             app.Command("decrypt", serviceProvider.GetRequiredService<DecryptCommand>().Configure);
             app.Command("extract", serviceProvider.GetRequiredService<ExtractCommand>().Configure);
+            app.Command("create", serviceProvider.GetRequiredService<CreateCommand>().Configure);
 
             var version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "No version found!";
             app.VersionOption("-v|--version", version, string.Format(HelpTexts.Version, version));
@@ -114,12 +115,19 @@ class Program
 
         services.AddSingleton<ExtractCommand>();
         services.AddSingleton<ExtractWithPfxFileCommand>();
+        services.AddSingleton<ExtractWithPemFileCommand>();
         services.AddSingleton<ExtractEncryptCommand>();
         services.AddSingleton<ExtractEncryptWithCommand>();
         services.AddSingleton<ExtractEncryptWithCertificateStoreCommand>();
         services.AddSingleton<ExtractEncryptWithPfxFileCommand>();
 
+        services.AddSingleton<CreateCommand>();
+        services.AddSingleton<CreateRootCommand>();
+        services.AddSingleton<CreateCertificateCommand>();
+        services.AddSingleton<CreateChainCommand>();
+
         services.AddSingleton<IHelpTextGenerator, HelperTextPage>();
         services.AddSingleton<ExtractCertificateHelper>();
+        services.AddSingleton<CreateCertificateHelper>();
     }
 }

@@ -1,0 +1,40 @@
+----------------------------------
+|       Arc4u Cyphertool.        |
+----------------------------------
+
+Create a certificate signed by an existing root certificate.
+
+                                                       / "C:\temp\My Root CA.pfx" -cap password                     \
+arc4u.cyphertool create cert "CN=My Certificate" -ca  |  "C:\temp\My Root CA.pem" -k "My Root CA.key.pem" -cap pwd  | -p password -f "folder"
+                                                       \ "My Root CA" -l LocalMachine -n My                         /
+
+A subject without a "=" is the common name: "My Certificate" is "CN=My Certificate".
+
+The root certificate:
+    -ca  | --certificate-authority => The root certificate, with its private key:
+                                      - a pfx file (.pfx or .p12),
+                                      - a pem file (.pem, .crt or .cer) with its private key given by -k,
+                                      - the friendly name of a certificate in the store or keychain.
+    -cap | --ca-password           => The password of the root pfx file or of its encrypted pem private key.
+                                      If not given, a prompt will ask the password.
+    -k   | --key                   => The pem private key file of the root pem certificate.
+    -n   | --storename             => The name of the folder where the certificate is stored in a Keychain or Certificate Store.
+    -l   | --storelocation         => The location where the certificate is stored in a Keychain or Certificate Store.
+                                      Like on Windows: CurrentUser or LocalMachine. Default is CurrentUser!
+
+The new certificate:
+    -p   | --password                 => The password protecting the pfx file and the private key.
+                                         If not given, a prompt will ask the password (twice).
+    -f   | --folder                   => The folder to store the files. Default is the current directory.
+    -kt  | --key-type                 => rsa (default) or ec.
+    -ks  | --key-size                 => The RSA key size: 2048, 3072 (default) or 4096.
+    -c   | --curve                    => The EC curve: P-256 (default), P-384 or P-521.
+    -y   | --years                    => The validity in years. Default is 2, never beyond the root validity.
+    -san | --subject-alternative-name => A dns name or an ip address, can be repeated: -san server.local -san 10.0.0.1
+
+The files {CN}.pfx (with the public root certificate), {CN}.pem and {CN}.key.pem are created.
+
+Example:
+
+arc4u.cyphertool create cert "My Certificate" -ca "./certs/My Root CA.pfx" -f ./certs
+arc4u.cyphertool create cert "CN=api.local" -ca "./certs/My Root CA.pem" -k "./certs/My Root CA.key.pem" -san api.local -f ./certs

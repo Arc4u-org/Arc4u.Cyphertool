@@ -1,0 +1,29 @@
+----------------------------------
+|       Arc4u Cyphertool.        |
+----------------------------------
+
+Create a root certificate (a private certificate authority) and certificates signed by it.
+
+                         / root  "CN=My Root CA"                                   => the root certificate alone.
+arc4u.cyphertool create |  cert  "CN=My Certificate" -ca "My Root CA.pfx"          => a certificate signed by an existing root.
+                         \ chain "CN=My Root CA" "CN=My Certificate"               => both at the same time.
+
+Each certificate is saved in 3 files (an existing file is never overwritten):
+    {CN}.pfx     => The certificate with its private key, protected by the password (AES-256).
+                    The pfx of a certificate also contains the public root certificate.
+    {CN}.pem     => The public certificate, to encrypt and to trust the root.
+    {CN}.key.pem => The private key, encrypted with the password (-----BEGIN ENCRYPTED PRIVATE KEY-----).
+
+The keys are RSA by default (-kt ec for an EC key).
+A certificate signed by the root can encrypt and decrypt with this tool, and can be used for TLS server or client authentication.
+
+To trust the root certificate, add its .pem file to the trusted roots of each machine:
+    Windows => certutil -addstore -f Root "My Root CA.pem"   (or -user for the current user)
+    macOS   => sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain "My Root CA.pem"
+    Linux   => sudo cp "My Root CA.pem" /usr/local/share/ca-certificates/my-root-ca.crt && sudo update-ca-certificates
+
+Keep the root pfx and key files offline: only the certificates signed by it are deployed.
+
+You can use the --help option to get more information about each command.
+
+like => arc4u.cyphertool create root --help.

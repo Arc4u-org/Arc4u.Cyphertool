@@ -37,7 +37,7 @@ namespace Arc4u.Cyphertool
 
             if (HasExtension(cert, ".pem", ".crt", ".cer"))
             {
-                return GetCertificateFromPemFile(cert, key, password);
+                return GetCertificateFromPemFile(cert, key, password, prompt);
             }
 
             // Certificate is coming from the store if the file name does not end with .pfx or .p12
@@ -73,9 +73,9 @@ namespace Arc4u.Cyphertool
 
         /// <summary>
         /// Load a pem (or der) certificate, with its pem private key when <paramref name="key"/> is given.
-        /// The private key can be encrypted (ENCRYPTED PRIVATE KEY), its password is then <paramref name="password"/>.
+        /// The private key can be encrypted (ENCRYPTED PRIVATE KEY), its password is then <paramref name="password"/>, prompted when not given.
         /// </summary>
-        private Result<X509Certificate2> GetCertificateFromPemFile(string cert, string? key, string? password)
+        private Result<X509Certificate2> GetCertificateFromPemFile(string cert, string? key, string? password, string prompt)
         {
             if (!File.Exists(cert))
             {
@@ -92,9 +92,19 @@ namespace Arc4u.Cyphertool
                 return Result.Fail($"The private key file {key} does not exist!");
             }
 
-            return Result.Try(() => string.IsNullOrEmpty(password)
-                                        ? X509Certificate2.CreateFromPemFile(cert, key)
-                                        : X509Certificate2.CreateFromEncryptedPemFile(cert, password, key));
+            if (!File.ReadAllText(key).Contains("-----BEGIN ENCRYPTED PRIVATE KEY-----", StringComparison.Ordinal))
+            {
+                return Result.Try(() => X509Certificate2.CreateFromPemFile(cert, key));
+            }
+
+            if (string.IsNullOrEmpty(password))
+            {
+                password = Prompt.GetPassword(prompt, ConsoleColor.DarkYellow);
+            }
+
+            // .NET gives the same message for a wrong password and for a key not matching the certificate.
+            return Result.Try(() => X509Certificate2.CreateFromEncryptedPemFile(cert, password, key),
+                              _ => new Error($"The encrypted private key {key} can't be read: the password is wrong or the key doesn't match the certificate {cert}."));
         }
         private Result<X509Certificate2> GetCertificateFromStore(string cert, string? storeName, string? storeLocation)
         {
@@ -165,6 +175,28 @@ namespace Arc4u.Cyphertool
                 }
             });
         }
+
+        /// <summary>
+        /// Export the private key (RSA or EC) in an encrypted PKCS#8 pem (ENCRYPTED PRIVATE KEY), protected by AES-256 and <paramref name="password"/>.
+        /// Read back by X509Certificate2.CreateFromEncryptedPemFile and openssl.
+        /// </summary>
+        public Result<string> ConvertEncryptedPrivateKeyToPem(X509Certificate2 x509, string password)
+        {
+            AsymmetricAlgorithm? privateKey = x509.GetRSAPrivateKey() ?? (AsymmetricAlgorithm?)x509.GetECDsaPrivateKey() ?? x509.GetECDiffieHellmanPrivateKey();
+            if (privateKey is null)
+            {
+                return Result.Fail("The certificate doesn't have a RSA or an EC private key.");
+            }
+            return Result.Try(() =>
+            {
+                using (privateKey)
+                {
+                    var pbe = new PbeParameters(PbeEncryptionAlgorithm.Aes256Cbc, HashAlgorithmName.SHA256, 600_000);
+                    return new string(privateKey.ExportEncryptedPkcs8PrivateKeyPem(password.AsSpan(), pbe)) + Environment.NewLine;
+                }
+            });
+        }
+
         private string ConvertToPem(string base64EncodedData, bool split = false)
         {
             if (!split)

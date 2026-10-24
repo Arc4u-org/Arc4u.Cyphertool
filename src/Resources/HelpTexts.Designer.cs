@@ -61,6 +61,51 @@ namespace Arc4u.Cyphertool.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Create a root certificate and certificates signed by it.
+        /// </summary>
+        internal static string CreateCommand {
+            get {
+                return ResourceManager.GetString("CreateCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Create a root certificate (a certificate authority) and save it alone.
+        /// </summary>
+        internal static string CreateRootCommand {
+            get {
+                return ResourceManager.GetString("CreateRootCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Create a certificate signed by an existing root certificate.
+        /// </summary>
+        internal static string CreateCertificateCommand {
+            get {
+                return ResourceManager.GetString("CreateCertificateCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Create a root certificate and a certificate signed by it, at the same time.
+        /// </summary>
+        internal static string CreateChainCommand {
+            get {
+                return ResourceManager.GetString("CreateChainCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Extract the public certificate and the private key in clear from a pem certificate and its private key.
+        /// </summary>
+        internal static string ExtractPemCommand {
+            get {
+                return ResourceManager.GetString("ExtractPemCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Decrypt from a pem certificate file and its private key.
         /// </summary>
         internal static string DecryptFromPemCommand {
