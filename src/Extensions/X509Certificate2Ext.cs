@@ -9,12 +9,25 @@ namespace Arc4u.Cyphertool.Extensions
 {
     internal static class X509Certificate2Ext
     {
+        private static readonly TimeSpan RegexTimeout = TimeSpan.FromMilliseconds(100);
+
         public static string GetCommonName(this X509Certificate2 x509)
         {
             string pattern = @"CN=([^,]+)";
-            Match match = Regex.Match(x509.Subject, pattern);
+            try
+            {
+                Match match = Regex.Match(x509.Subject, pattern, RegexOptions.None, RegexTimeout);
+                if (match.Success)
+                {
+                    return match.Groups[1].Value;
+                }
+            }
+            catch (RegexMatchTimeoutException)
+            {
+                // Fall through to the friendly name.
+            }
 
-            return match.Success ? match.Groups[1].Value : x509.FriendlyName ?? "Unknown";
+            return x509.FriendlyName ?? "Unknown";
         }
     }
 }
