@@ -22,7 +22,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: Package version (e.g. 2.0.0-preview01). Empty = the <Version> of Arc4u.Cyphertool.csproj
+        description: Package version (e.g. 2.0.0). Empty = the <Version> of Arc4u.Cyphertool.csproj
         type: string
         default: ''
       push:
@@ -89,7 +89,7 @@ jobs:
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y clang zlib1g-dev
 
-      # The version comes from the tag (v2.0.0-preview01 => 2.0.0-preview01), else from the 'version' input,
+      # The version comes from the tag (v2.0.0 => 2.0.0), else from the 'version' input,
       # else from <Version> in the csproj. Every matrix job resolves the same value, so all packages match.
       - name: Pack
         shell: bash
